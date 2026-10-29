@@ -1,0 +1,49 @@
+name: Pepper bot
+
+on:
+  schedule:
+    # Start co 30 min. Każde zadanie sprawdza Pepper co minutę przez ok. 58 min,
+    # a nowe zadanie przerywa poprzednie, więc nie ma przerw mimo opóźnień GitHuba.
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}   # ręczne uruchomienie z zakładki Actions
+
+concurrency:
+  group: pepper-bot
+  cancel-in-progress: true
+
+permissions:
+  contents: write   # potrzebne do commitowania seen.json
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      LOOP_MINUTES: 58
+      CHECK_EVERY: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Sprawdzaj Pepper co minutę
+        run: |
+          git config user.name "pepper-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          end=$(( $(date +%s) + LOOP_MINUTES * 60 ))
+          while [ "$(date +%s)" -lt "$end" ]; do
+            start=$(date +%s)
+            python pepper_bot.py --once || echo "Sprawdzenie nie powiodło się, próbuję dalej"
+            if ! git diff --quiet -- seen.json 2>/dev/null || [ -n "$(git ls-files --others -- seen.json)" ]; then
+              git add seen.json
+              git commit -q -m "Aktualizacja seen.json"
+              git pull -q --rebase -X theirs || git rebase --abort
+              git push -q || echo "Push nie powiódł się, spróbuję przy następnym commicie"
+            fi
+            sleep $(( CHECK_EVERY - ( $(date +%s) - start ) > 0 ? CHECK_EVERY - ( $(date +%s) - start ) : 1 ))
+          done

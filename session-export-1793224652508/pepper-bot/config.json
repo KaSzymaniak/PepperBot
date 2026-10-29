@@ -1,0 +1,19 @@
+{
+  "interval_seconds": 60,
+  "feeds": [
+    {
+      "name": "Karty graficzne",
+      "url": "https://www.pepper.pl/rss/grupa/karty-graficzne",
+      "keywords": [],
+      "exclude": ["laptop"],
+      "max_price": 4500
+    },
+    {
+      "name": "Procesory",
+      "url": "https://www.pepper.pl/rss/grupa/procesory",
+      "keywords": [],
+      "exclude": [],
+      "max_price": null
+    }
+  ]
+}
