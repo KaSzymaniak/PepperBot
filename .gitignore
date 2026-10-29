@@ -1,2 +1,4 @@
-   secrets.json
-   __pycache__/
+secrets.json
+__pycache__/
+session-export-*/
+*.zip

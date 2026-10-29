@@ -2,15 +2,17 @@ name: Pepper bot
 
 on:
   schedule:
+    # Start co 30 min. Każde zadanie sprawdza Pepper co minutę przez ok. 58 min,
+    # a nowe zadanie przerywa poprzednie, więc nie ma przerw mimo opóźnień GitHuba.
     - cron: "*/30 * * * *"
-  workflow_dispatch: {}
+  workflow_dispatch: {}   # ręczne uruchomienie z zakładki Actions
 
 concurrency:
   group: pepper-bot
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: write   # potrzebne do commitowania seen.json
 
 jobs:
   watch:
@@ -23,9 +25,9 @@ jobs:
       LOOP_MINUTES: 58
       CHECK_EVERY: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
