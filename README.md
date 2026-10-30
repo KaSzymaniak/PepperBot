@@ -45,6 +45,22 @@ Edytuj `config.json` (można bezpośrednio na GitHubie, ikoną ołówka):
   wariant co 5 minut, w `.github/workflows/pepper.yml` ustaw `cron: "*/5 * * * *"` i `LOOP_MINUTES: 1`.
 - Postęp i błędy widać w zakładce Actions, w logach zadania.
 
+## Obserwowanie cen (Ceneo + Amazon.pl)
+
+`price_watch.py` co 15 minut sprawdza ceny kart z listy `price_watch.items` w `config.json`
+i wysyła powiadomienie (zielone na Discordzie), gdy cena spadnie do progu `max_price` lub niżej.
+O tej samej ofercie przypomni tylko wtedy, gdy cena spadnie o co najmniej 1% albo gdy
+wcześniej wróciła powyżej progu. Stan zapisuje w `price_state.json`.
+
+- `include` / `exclude` – wyrażenia regularne dopasowywane do nazwy oferty (małymi literami).
+- `max_price` – próg w zł; oferty poniżej 60% progu są pomijane jako akcesoria lub błędne opisy
+  (zmienisz to polem `min_price`).
+- `sources` – `["ceneo", "amazon"]`. Ceneo zbiera oferty m.in. z Media Expert, x-kom, Morele,
+  Proshop i RTV Euro AGD. Amazon po kilku zapytaniach potrafi włączyć ochronę antybotową –
+  bot wtedy odpuszcza go do następnego sprawdzenia (w logu: „Amazon włączył ochronę antybotową”).
+
+Lokalnie: `python price_watch.py --dry-run` pokaże, co by wysłał.
+
 ## Lokalnie
 
 ```bash

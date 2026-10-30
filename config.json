@@ -5,7 +5,9 @@
       "name": "Karty graficzne",
       "url": "https://www.pepper.pl/rss/grupa/karty-graficzne",
       "keywords": [],
-      "exclude": ["laptop"],
+      "exclude": [
+        "laptop"
+      ],
       "max_price": 4500
     },
     {
@@ -15,5 +17,77 @@
       "exclude": [],
       "max_price": null
     }
-  ]
+  ],
+  "price_watch": {
+    "interval_minutes": 15,
+    "sources": [
+      "ceneo",
+      "amazon"
+    ],
+    "items": [
+      {
+        "name": "RTX 5060",
+        "query": "rtx 5060",
+        "include": "5060(?!\\s*ti)",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|5060\\s*ti|5060ti|5050",
+        "max_price": 1850
+      },
+      {
+        "name": "RX 9060 XT 8GB",
+        "query": "rx 9060 xt 8gb",
+        "include": "9060\\s*xt.*\\b8\\s*gb",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|16\\s*gb|9070",
+        "max_price": 1900
+      },
+      {
+        "name": "RTX 5060 Ti 8GB",
+        "query": "rtx 5060 ti 8gb",
+        "include": "5060\\s*ti.*\\b8\\s*gb",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|16\\s*gb|5050|rtx\\s*5060(?!\\s*ti)",
+        "max_price": 2100
+      },
+      {
+        "name": "RX 9060 XT 16GB",
+        "query": "rx 9060 xt 16gb",
+        "include": "9060\\s*xt.*16\\s*gb",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|9070",
+        "max_price": 2450
+      },
+      {
+        "name": "RTX 5060 Ti 16GB",
+        "query": "rtx 5060 ti 16gb",
+        "include": "5060\\s*ti.*16\\s*gb",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|5050|5070",
+        "max_price": 2900
+      },
+      {
+        "name": "RX 9070 GRE",
+        "query": "rx 9070 gre",
+        "include": "9070\\s*gre",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|9060",
+        "max_price": 2650
+      },
+      {
+        "name": "RTX 5070",
+        "query": "rtx 5070",
+        "include": "5070",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|5070\\s*ti|5070ti|5060|5080",
+        "max_price": 3300
+      },
+      {
+        "name": "RX 9070",
+        "query": "rx 9070 16gb",
+        "include": "9070",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|xt|gre|12\\s*gb|9060",
+        "max_price": 3150
+      },
+      {
+        "name": "RX 9070 XT",
+        "query": "rx 9070 xt",
+        "include": "9070\\s*xt",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|9060",
+        "max_price": 3700
+      }
+    ]
+  }
 }

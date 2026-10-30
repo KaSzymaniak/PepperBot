@@ -31,7 +31,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Sprawdzaj Pepper co minutę
+      - name: Sprawdzaj Pepper co minutę i ceny co 15 min
         run: |
           git config user.name "pepper-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -39,9 +39,11 @@ jobs:
           while [ "$(date +%s)" -lt "$end" ]; do
             start=$(date +%s)
             python pepper_bot.py --once || echo "Sprawdzenie nie powiodło się, próbuję dalej"
-            if ! git diff --quiet -- seen.json 2>/dev/null || [ -n "$(git ls-files --others -- seen.json)" ]; then
-              git add seen.json
-              git commit -q -m "Aktualizacja seen.json"
+            # ceny na Ceneo/Amazonie - skrypt sam pilnuje, żeby sprawdzać co 15 min
+            python price_watch.py --once || echo "Sprawdzenie cen nie powiodło się, próbuję dalej"
+            if ! git diff --quiet -- seen.json price_state.json 2>/dev/null || [ -n "$(git ls-files --others -- seen.json price_state.json)" ]; then
+              git add seen.json price_state.json 2>/dev/null || git add seen.json
+              git commit -q -m "Aktualizacja stanu bota"
               git pull -q --rebase -X theirs || git rebase --abort
               git push -q || echo "Push nie powiódł się, spróbuję przy następnym commicie"
             fi
