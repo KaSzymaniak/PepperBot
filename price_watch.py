@@ -61,6 +61,9 @@ def search_ceneo(query):
     # ;0112-0 = sortowanie od najtańszych
     url = "https://www.ceneo.pl/Karty_graficzne;szukaj-" + urllib.parse.quote_plus(query) + ";0112-0.htm"
     d = browser_get(url)
+    if "cat-prod-row" not in d:
+        # Ceneo nie zwraca błędu, tylko stronę bez listy produktów (np. dla serwerów GitHuba)
+        raise Blocked("Ceneo nie zwrócił listy produktów (blokada lub zmiana strony)")
     for chunk in d.split('class="cat-prod-row__name"')[1:]:
         name = re.search(r"<span\s*>([^<]+)</span>", chunk)
         link = re.search(r'href="/(\d+)', chunk)
