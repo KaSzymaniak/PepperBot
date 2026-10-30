@@ -19,7 +19,7 @@
     }
   ],
   "price_watch": {
-    "interval_minutes": 15,
+    "interval_minutes": 30,
     "sources": [
       "ceneo",
       "amazon"
@@ -88,6 +88,18 @@
         "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|9060",
         "max_price": 3700
       }
+    ],
+    "delay_seconds": [
+      10,
+      20
+    ],
+    "queries": [
+      "rx 9070",
+      "rx 9070 xt",
+      "rx 9060 xt",
+      "rtx 5060",
+      "rtx 5060 ti",
+      "rtx 5070"
     ]
   }
 }

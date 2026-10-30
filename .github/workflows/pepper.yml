@@ -24,6 +24,8 @@ jobs:
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       LOOP_MINUTES: 58
       CHECK_EVERY: 60
+      # Ceneo blokuje serwery GitHuba, więc tutaj sprawdzamy tylko Amazon
+      PRICE_SOURCES: amazon
     steps:
       - uses: actions/checkout@v5
 
@@ -31,7 +33,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Sprawdzaj Pepper co minutę i ceny co 15 min
+      - name: Sprawdzaj Pepper co minutę i ceny co 30 min
         run: |
           git config user.name "pepper-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -39,7 +41,7 @@ jobs:
           while [ "$(date +%s)" -lt "$end" ]; do
             start=$(date +%s)
             python pepper_bot.py --once || echo "Sprawdzenie nie powiodło się, próbuję dalej"
-            # ceny na Ceneo/Amazonie - skrypt sam pilnuje, żeby sprawdzać co 15 min
+            # ceny na Amazonie - skrypt sam pilnuje, żeby sprawdzać co 30 min
             python price_watch.py --once || echo "Sprawdzenie cen nie powiodło się, próbuję dalej"
             if ! git diff --quiet -- seen.json price_state.json 2>/dev/null || [ -n "$(git ls-files --others -- seen.json price_state.json)" ]; then
               git add seen.json price_state.json 2>/dev/null || git add seen.json

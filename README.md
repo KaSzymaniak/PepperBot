@@ -47,7 +47,7 @@ Edytuj `config.json` (można bezpośrednio na GitHubie, ikoną ołówka):
 
 ## Obserwowanie cen (Ceneo + Amazon.pl)
 
-`price_watch.py` co 15 minut sprawdza ceny kart z listy `price_watch.items` w `config.json`
+`price_watch.py` co 30 minut sprawdza ceny kart z listy `price_watch.items` w `config.json`
 i wysyła powiadomienie (zielone na Discordzie), gdy cena spadnie do progu `max_price` lub niżej.
 O tej samej ofercie przypomni tylko wtedy, gdy cena spadnie o co najmniej 1% albo gdy
 wcześniej wróciła powyżej progu. Stan zapisuje w `price_state.json`.
@@ -58,6 +58,11 @@ wcześniej wróciła powyżej progu. Stan zapisuje w `price_state.json`.
 - `sources` – `["ceneo", "amazon"]`. Ceneo zbiera oferty m.in. z Media Expert, x-kom, Morele,
   Proshop i RTV Euro AGD. Amazon po kilku zapytaniach potrafi włączyć ochronę antybotową –
   bot wtedy odpuszcza go do następnego sprawdzenia (w logu: „Amazon włączył ochronę antybotową”).
+
+- `queries` – kilka szerokich wyszukiwań (np. „rx 9070” łapie też GRE), dopasowywanych do wszystkich kart z listy.
+  Między zapytaniami bot czeka losowo `delay_seconds` (domyślnie 10–20 s).
+- Na GitHubie działa tylko Amazon (`PRICE_SOURCES: amazon` w workflow), bo Ceneo blokuje serwery GitHuba.
+  Ceneo zadziała, gdy uruchomisz bota z domowego internetu.
 
 Lokalnie: `python price_watch.py --dry-run` pokaże, co by wysłał.
 

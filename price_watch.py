@@ -6,7 +6,7 @@ spadnie do progu max_price lub niżej. O tej samej ofercie powiadamia ponownie
 tylko wtedy, gdy cena spadnie jeszcze bardziej albo gdy wcześniej wróciła
 powyżej progu.
 
-Sprawdza najwyżej co price_watch.interval_minutes - można go wołać co minutę
+Sprawdza najwyżej co price_watch.interval_minutes (domyślnie 30) - można go wołać co minutę
 (jak w workflow), a i tak nie będzie zbyt często pytał sklepów.
 
 Użycie:
@@ -16,6 +16,8 @@ Użycie:
 """
 import html
 import json
+import os
+import random
 import re
 import sys
 import time
@@ -160,29 +162,39 @@ def check(config, dry_run=False, force=False):
     if not watch or not watch.get("items"):
         return
     last_run = float(LAST_RUN_FILE.read_text()) if LAST_RUN_FILE.exists() else 0
-    if not (dry_run or force) and time.time() - last_run < watch.get("interval_minutes", 15) * 60:
+    if not (dry_run or force) and time.time() - last_run < watch.get("interval_minutes", 30) * 60:
         return
+    items = watch["items"]
+    # kilka szerokich zapytań (np. "rx 9070" łapie 9070, XT i GRE) zamiast osobnego na każdą kartę
+    queries = watch.get("queries") or list(dict.fromkeys(i.get("query", i["name"]) for i in items))
+    lo, hi = watch.get("delay_seconds", [10, 20])
+    sources = os.environ.get("PRICE_SOURCES", "").split(",") if os.environ.get("PRICE_SOURCES") else watch.get("sources", ["ceneo"])
     notified = load_state()
     sent = 0
-    for source in watch.get("sources", ["ceneo"]):
-        search = SOURCES[source]
-        for item in watch["items"]:
+    first = True
+    for source in sources:
+        search = SOURCES[source.strip()]
+        for query in queries:
+            if not first:
+                time.sleep(random.uniform(lo, hi))  # spokojne tempo, żeby nie obciążać sklepu
+            first = False
             try:
-                offers = list(search(item.get("query", item["name"])))
+                offers = list(search(query))
             except Blocked as e:
                 print(f"{e} - pomijam {source} do następnego sprawdzenia")
                 break
             except Exception as e:
-                print(f"Błąd {source} / {item['name']}: {e}")
+                print(f"Błąd {source} / {query}: {e}")
                 continue
-            finally:
-                time.sleep(2)  # nie zasypujemy sklepu zapytaniami
             for offer in offers:
+                item = next((i for i in items if is_model(offer, i)), None)
+                if item is None:
+                    continue
                 key = offer["link"]
                 if not matches(offer, item):
                     # oferta wróciła powyżej progu - zapominamy ją, żeby kolejny
                     # spadek znowu dał powiadomienie
-                    if key in notified and is_model(offer, item) and offer["price"] > item["max_price"]:
+                    if key in notified and offer["price"] > item["max_price"]:
                         del notified[key]
                     continue
                 last = notified.get(key)
@@ -199,7 +211,7 @@ def check(config, dry_run=False, force=False):
     if not dry_run:
         LAST_RUN_FILE.write_text(str(time.time()))
         save_state(notified)
-    print(f"{time.strftime('%H:%M:%S')} ceny: wysłano {sent} powiadomień")
+    print(f"{time.strftime('%H:%M:%S')} ceny: wysłano {sent} powiadomień ({len(queries)} zapytań na źródło)")
 
 
 def main():
