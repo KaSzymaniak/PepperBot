@@ -2,17 +2,21 @@ name: Pepper bot
 
 on:
   schedule:
-    # Start co 30 min. Każde zadanie sprawdza Pepper co minutę przez ok. 58 min,
-    # a nowe zadanie przerywa poprzednie, więc nie ma przerw mimo opóźnień GitHuba.
-    - cron: "*/30 * * * *"
+    # Każde zadanie na koniec samo uruchamia następne (ostatni krok), więc bot działa
+    # bez przerw. Harmonogram to tylko zapas, gdyby łańcuch się przerwał - GitHub i tak
+    # często pomija zaplanowane uruchomienia. Nieparzyste minuty, bo pełne godziny są zatłoczone.
+    - cron: "17 * * * *"
   workflow_dispatch: {}   # ręczne uruchomienie z zakładki Actions
 
+# Jedno zadanie naraz. Nowe czeka w kolejce, aż obecne skończy (GitHub trzyma w kolejce
+# najwyżej jedno, więc zapasowe z harmonogramu nie zdubluje łańcucha).
 concurrency:
   group: pepper-bot
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write   # potrzebne do commitowania seen.json
+  actions: write    # potrzebne do uruchomienia następnego zadania
 
 jobs:
   watch:
@@ -51,3 +55,14 @@ jobs:
             fi
             sleep $(( CHECK_EVERY - ( $(date +%s) - start ) > 0 ? CHECK_EVERY - ( $(date +%s) - start ) : 1 ))
           done
+
+      # Nie uruchamia się po ręcznym anulowaniu (Cancel workflow), więc łańcuch można zatrzymać.
+      # Na stałe: Actions -> Pepper bot -> ... -> Disable workflow.
+      - name: Uruchom następne zadanie
+        if: success() || failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          url="https://api.github.com/repos/${{ github.repository }}/actions/workflows/pepper.yml/dispatches"
+          curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -d '{"ref":"${{ github.ref_name }}"}' "$url"
+          echo "Następne zadanie uruchomione"

@@ -1,7 +1,8 @@
 # pepper-bot
 
 Wysyła na Discord (lub Telegram) nowe okazje z Pepper.pl z kategorii **karty graficzne** i **procesory**.
-Działa w GitHub Actions: zadanie startuje co 30 minut i w środku sprawdza Pepper co minutę.
+Działa w GitHub Actions: zadanie przez ok. 58 minut sprawdza Pepper co minutę, a na koniec
+samo uruchamia następne. Harmonogram co godzinę jest tylko zapasem, gdyby łańcuch się przerwał.
 
 ## Uruchomienie na GitHubie
 
@@ -26,7 +27,8 @@ Działa w GitHub Actions: zadanie startuje co 30 minut i w środku sprawdza Pepp
    Workflow permissions → zaznacz "Read and write permissions" → Save.
 5. **Uruchom pierwszy raz ręcznie:** zakładka Actions → "Pepper bot" → Run workflow.
    Pierwsze sprawdzenie tylko zapamiętuje obecne okazje (bez spamu), kolejne wysyłają nowe.
-   Dalej zadanie uruchamia się samo co 30 minut.
+   Dalej każde zadanie samo uruchamia następne. Żeby zatrzymać bota: Actions → "Pepper bot" →
+   ⋯ → Disable workflow (samo Cancel workflow zatrzyma łańcuch, ale harmonogram go wznowi).
 
 ## Zmiana filtrów
 
