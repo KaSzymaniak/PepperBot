@@ -43,6 +43,8 @@ def load_config():
         "bot_token": os.environ.get("TELEGRAM_BOT_TOKEN") or secrets.get("telegram_bot_token", ""),
         "chat_id": os.environ.get("TELEGRAM_CHAT_ID") or secrets.get("telegram_chat_id", ""),
     }
+    for feed in config["feeds"]:
+        feed["_price_watch_items"] = config.get("price_watch", {}).get("items", [])
     if not config["discord_webhook"] and not config["telegram"]["bot_token"]:
         print("Uwaga: brak DISCORD_WEBHOOK i TELEGRAM_BOT_TOKEN - powiadomienia nie zostaną wysłane.")
     return config
@@ -107,7 +109,22 @@ def matches(deal, feed):
     max_price = feed.get("max_price")
     if max_price and deal["price"] is not None and deal["price"] > max_price:
         return False
+    category = feed.get("price_watch_category")
+    if category:
+        # tylko modele z listy price_watch tej kategorii, każdy z własnym progiem ceny
+        models = [i for i in feed["_price_watch_items"] if i.get("category") == category]
+        model = next((m for m in models if model_matches(title, m)), None)
+        if model is None:
+            return False
+        if deal["price"] is not None and deal["price"] > model["max_price"]:
+            return False
     return True
+
+
+def model_matches(title, model):
+    if not re.search(model["include"], title):
+        return False
+    return not (model.get("exclude") and re.search(model["exclude"], title))
 
 
 def notify_discord(webhook, deal):

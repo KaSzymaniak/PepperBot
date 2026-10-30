@@ -64,6 +64,9 @@ wcześniej wróciła powyżej progu. Stan zapisuje w `price_state.json`.
 - Na GitHubie działa tylko Amazon (`PRICE_SOURCES: amazon` w workflow), bo Ceneo blokuje serwery GitHuba.
   Ceneo zadziała, gdy uruchomisz bota z domowego internetu.
 
+- `category` – `gpu` albo `cpu`. Kanał Pepper z polem `price_watch_category` (np. „Procesory” z `cpu`)
+  przepuszcza tylko modele z tej kategorii, każdy w swoim progu `max_price`.
+
 Lokalnie: `python price_watch.py --dry-run` pokaże, co by wysłał.
 
 ## Lokalnie

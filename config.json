@@ -15,7 +15,8 @@
       "url": "https://www.pepper.pl/rss/grupa/procesory",
       "keywords": [],
       "exclude": [],
-      "max_price": null
+      "max_price": null,
+      "price_watch_category": "cpu"
     }
   ],
   "price_watch": {
@@ -30,63 +31,135 @@
         "query": "rtx 5060",
         "include": "5060(?!\\s*ti)",
         "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|5060\\s*ti|5060ti|5050",
-        "max_price": 1850
+        "max_price": 1850,
+        "category": "gpu"
       },
       {
         "name": "RX 9060 XT 8GB",
         "query": "rx 9060 xt 8gb",
         "include": "9060\\s*xt.*\\b8\\s*gb",
         "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|16\\s*gb|9070",
-        "max_price": 1900
+        "max_price": 1900,
+        "category": "gpu"
       },
       {
         "name": "RTX 5060 Ti 8GB",
         "query": "rtx 5060 ti 8gb",
         "include": "5060\\s*ti.*\\b8\\s*gb",
         "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|16\\s*gb|5050|rtx\\s*5060(?!\\s*ti)",
-        "max_price": 2100
+        "max_price": 2100,
+        "category": "gpu"
       },
       {
         "name": "RX 9060 XT 16GB",
         "query": "rx 9060 xt 16gb",
         "include": "9060\\s*xt.*16\\s*gb",
         "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|9070",
-        "max_price": 2450
+        "max_price": 2450,
+        "category": "gpu"
       },
       {
         "name": "RTX 5060 Ti 16GB",
         "query": "rtx 5060 ti 16gb",
         "include": "5060\\s*ti.*16\\s*gb",
         "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|5050|5070",
-        "max_price": 2900
+        "max_price": 2900,
+        "category": "gpu"
       },
       {
         "name": "RX 9070 GRE",
         "query": "rx 9070 gre",
         "include": "9070\\s*gre",
         "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|9060",
-        "max_price": 2650
+        "max_price": 2650,
+        "category": "gpu"
       },
       {
         "name": "RTX 5070",
         "query": "rtx 5070",
         "include": "5070",
         "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|5070\\s*ti|5070ti|5060|5080",
-        "max_price": 3300
+        "max_price": 3300,
+        "category": "gpu"
       },
       {
         "name": "RX 9070",
         "query": "rx 9070 16gb",
         "include": "9070",
         "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|xt|gre|12\\s*gb|9060",
-        "max_price": 3150
+        "max_price": 3150,
+        "category": "gpu"
       },
       {
         "name": "RX 9070 XT",
         "query": "rx 9070 xt",
         "include": "9070\\s*xt",
         "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|9060",
-        "max_price": 3700
+        "max_price": 3700,
+        "category": "gpu"
+      },
+      {
+        "name": "Ryzen 5 5500",
+        "category": "cpu",
+        "include": "ryzen\\W*\\d?\\s*5500(?![\\dxhu])",
+        "exclude": "laptop|notebook|zestaw|komputer|mini pc|chłodz|cooler|płyta",
+        "max_price": 340
+      },
+      {
+        "name": "Ryzen 5 5600",
+        "category": "cpu",
+        "include": "ryzen\\W*\\d?\\s*5600(?![\\dxtghu])",
+        "exclude": "laptop|notebook|zestaw|komputer|mini pc|chłodz|cooler|płyta",
+        "max_price": 450
+      },
+      {
+        "name": "Ryzen 5 5600X",
+        "category": "cpu",
+        "include": "ryzen\\W*\\d?\\s*5600\\s*x(?![t3])",
+        "exclude": "laptop|notebook|zestaw|komputer|mini pc|chłodz|cooler|płyta",
+        "max_price": 470
+      },
+      {
+        "name": "Ryzen 5 5600XT",
+        "category": "cpu",
+        "include": "ryzen\\W*\\d?\\s*5600\\s*xt",
+        "exclude": "laptop|notebook|zestaw|komputer|mini pc|chłodz|cooler|płyta",
+        "max_price": 520
+      },
+      {
+        "name": "Ryzen 7 5700X",
+        "category": "cpu",
+        "include": "ryzen\\W*\\d?\\s*5700\\s*x(?![t3])",
+        "exclude": "laptop|notebook|zestaw|komputer|mini pc|chłodz|cooler|płyta",
+        "max_price": 600
+      },
+      {
+        "name": "Ryzen 7 5700X3D",
+        "category": "cpu",
+        "include": "ryzen\\W*\\d?\\s*5700\\s*x3d",
+        "exclude": "laptop|notebook|zestaw|komputer|mini pc|chłodz|cooler|płyta",
+        "max_price": 900
+      },
+      {
+        "name": "Ryzen 7 5800X3D",
+        "category": "cpu",
+        "include": "ryzen\\W*\\d?\\s*5800\\s*x3d",
+        "exclude": "laptop|notebook|zestaw|komputer|mini pc|chłodz|cooler|płyta",
+        "max_price": 1100
+      },
+      {
+        "name": "Ryzen 9 5900XT",
+        "category": "cpu",
+        "include": "ryzen\\W*\\d?\\s*5900\\s*xt",
+        "exclude": "laptop|notebook|zestaw|komputer|mini pc|chłodz|cooler|płyta",
+        "max_price": 1000
+      },
+      {
+        "name": "Ryzen 9 5950X",
+        "category": "cpu",
+        "include": "ryzen\\W*\\d?\\s*5950\\s*x",
+        "exclude": "laptop|notebook|zestaw|komputer|mini pc|chłodz|cooler|płyta",
+        "max_price": 1200
       }
     ],
     "delay_seconds": [
@@ -99,7 +172,10 @@
       "rx 9060 xt",
       "rtx 5060",
       "rtx 5060 ti",
-      "rtx 5070"
+      "rtx 5070",
+      "ryzen 5 5600",
+      "ryzen 7 5800x3d",
+      "ryzen 9 5950x"
     ]
   }
 }
