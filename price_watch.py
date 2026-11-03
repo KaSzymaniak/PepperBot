@@ -166,6 +166,8 @@ def search_proline(query):
 
 def search_sferis(query):
     d = browser_get("https://www.sferis.pl/wyszukaj?s=" + urllib.parse.quote_plus(query))
+    if "Nie znaleziono produktów" in d:
+        return
     if "jsProductListingItems" not in d:
         raise Blocked("Sferis nie zwrócił listy produktów (blokada lub zmiana strony)")
     # każdy kafelek zaczyna się od linku do produktu kończącego się na -i<id>
