@@ -28,8 +28,8 @@ jobs:
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       LOOP_MINUTES: 58
       CHECK_EVERY: 60
-      # Ceneo blokuje serwery GitHuba, więc go tu pomijamy
-      PRICE_SOURCES: amazon,xkom,morele,mediamarkt,proline,sferis
+      # Amazon, x-kom i Ceneo sprawdza laptop w domu (laptop_watch.py), bo serwery GitHuba blokują
+      PRICE_SOURCES: morele,mediamarkt,proline,sferis
     steps:
       - uses: actions/checkout@v5
 

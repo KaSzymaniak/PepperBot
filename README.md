@@ -68,13 +68,35 @@ wcześniej wróciła powyżej progu. Stan zapisuje w `price_state.json`.
 - `queries` – kilka szerokich wyszukiwań (np. „rx 9070” łapie też GRE), dopasowywanych do wszystkich kart z listy.
   Każde zapytanie idzie po kolei do wszystkich sklepów, potem bot czeka losowo `delay_seconds`
   (domyślnie 10–20 s).
-- Na GitHubie Ceneo jest pominięte (`PRICE_SOURCES` w workflow), bo blokuje serwery GitHuba.
-  Ceneo zadziała, gdy uruchomisz bota z domowego internetu.
+- Na GitHubie sprawdzane są tylko Morele, MediaMarkt, Proline i Sferis (`PRICE_SOURCES` w workflow).
+  Amazon, x-kom i Ceneo sprawdza laptop w domu – patrz niżej.
 
 - `category` – `gpu` albo `cpu`. Kanał Pepper z polem `price_watch_category` (np. „Procesory” z `cpu`)
   przepuszcza tylko modele z tej kategorii, każdy w swoim progu `max_price`.
 
 Lokalnie: `python price_watch.py --dry-run` pokaże, co by wysłał.
+
+## Laptop w domu (Amazon, x-kom, Ceneo co 10 minut)
+
+Te sklepy blokują serwery GitHuba, ale wpuszczają domowy internet (Amazon czasem pokazuje
+blokadę i tutaj – wtedy pominięte wyszukiwania wracają przy następnym sprawdzeniu).
+`laptop_watch.py` sprawdza je, a wynik dopisuje do `laptop.log`.
+
+1. Zainstaluj Pythona z python.org i zaznacz „Add python.exe to PATH”.
+2. Pobierz repo (Code → Download ZIP) i rozpakuj do `C:\PepperBot`.
+3. Utwórz `C:\PepperBot\secrets.json` z webhookiem Discorda:
+   `{"discord_webhook": "https://discord.com/api/webhooks/..."}`. Webhook skopiujesz w Discordzie:
+   ustawienia serwera → Integracje → Webhooki (z sekretów GitHuba nie da się go odczytać).
+4. Test w wierszu poleceń: `py C:\PepperBot\laptop_watch.py`, potem otwórz `C:\PepperBot\laptop.log`.
+   Powinna tam być linia `ceny: wysłano ... (9 zapytań na źródło: amazon, xkom, ceneo)`.
+5. Uruchamianie co 10 minut bez okna konsoli:
+   `schtasks /create /tn "PepperBot ceny" /tr "pyw C:\PepperBot\laptop_watch.py" /sc minute /mo 10 /f`
+   Zatrzymanie: `schtasks /delete /tn "PepperBot ceny" /f`.
+6. Zasilanie: przy zasilaczu usypianie „Nigdy”, a zamknięcie pokrywy „Nic nie rób”
+   (Panel sterowania → Opcje zasilania). W Lenovo Vantage ustaw limit ładowania baterii na ok. 80%.
+
+Zadanie działa tylko, gdy jesteś zalogowany – po restarcie (np. po aktualizacji Windows) zaloguj się raz.
+Aktualizacja: pobierz ZIP ponownie i nadpisz pliki, zostawiając `secrets.json` i `price_state_laptop.json`.
 
 ## Lokalnie
 

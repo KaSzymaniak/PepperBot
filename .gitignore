@@ -3,3 +3,5 @@ __pycache__/
 session-export-*/
 *.zip
 .price_last_run
+price_state_laptop.json
+laptop.log

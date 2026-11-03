@@ -29,7 +29,8 @@ from pathlib import Path
 from pepper_bot import http_post_json, load_config
 
 HERE = Path(__file__).resolve().parent
-STATE_FILE = HERE / "price_state.json"
+# laptop trzyma własny stan, żeby nie gryzł się z plikiem commitowanym przez GitHuba
+STATE_FILE = Path(os.environ.get("PRICE_STATE_FILE") or HERE / "price_state.json")
 LAST_RUN_FILE = HERE / ".price_last_run"  # poza repo, żeby nie commitować co 15 min
 BROWSER_UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
