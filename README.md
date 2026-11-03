@@ -47,7 +47,7 @@ Edytuj `config.json` (można bezpośrednio na GitHubie, ikoną ołówka):
   wariant co 5 minut, w `.github/workflows/pepper.yml` ustaw `cron: "*/5 * * * *"` i `LOOP_MINUTES: 1`.
 - Postęp i błędy widać w zakładce Actions, w logach zadania.
 
-## Obserwowanie cen (Ceneo + Amazon.pl)
+## Obserwowanie cen (Amazon.pl, x-kom, Morele, Ceneo)
 
 `price_watch.py` co 30 minut sprawdza ceny kart z listy `price_watch.items` w `config.json`
 i wysyła powiadomienie (zielone na Discordzie), gdy cena spadnie do progu `max_price` lub niżej.
@@ -57,13 +57,16 @@ wcześniej wróciła powyżej progu. Stan zapisuje w `price_state.json`.
 - `include` / `exclude` – wyrażenia regularne dopasowywane do nazwy oferty (małymi literami).
 - `max_price` – próg w zł; oferty poniżej 60% progu są pomijane jako akcesoria lub błędne opisy
   (zmienisz to polem `min_price`).
-- `sources` – `["ceneo", "amazon"]`. Ceneo zbiera oferty m.in. z Media Expert, x-kom, Morele,
-  Proshop i RTV Euro AGD. Amazon po kilku zapytaniach potrafi włączyć ochronę antybotową –
-  bot wtedy odpuszcza go do następnego sprawdzenia (w logu: „Amazon włączył ochronę antybotową”).
+- `sources` – dowolne z `amazon`, `xkom`, `morele`, `ceneo`. Ceneo zbiera oferty m.in. z Media Expert,
+  x-kom, Morele, Proshop i RTV Euro AGD. Gdy sklep włączy ochronę antybotową albo odmówi dostępu,
+  bot odpuszcza go do następnego sprawdzenia (w logu np. „Amazon włączył ochronę antybotową”).
+  Z x-komu brane są tylko oferty dostępne od ręki. RTV Euro AGD i Media Expert blokują
+  takie zapytania, więc ich nie ma.
 
 - `queries` – kilka szerokich wyszukiwań (np. „rx 9070” łapie też GRE), dopasowywanych do wszystkich kart z listy.
-  Między zapytaniami bot czeka losowo `delay_seconds` (domyślnie 10–20 s).
-- Na GitHubie działa tylko Amazon (`PRICE_SOURCES: amazon` w workflow), bo Ceneo blokuje serwery GitHuba.
+  Każde zapytanie idzie po kolei do wszystkich sklepów, potem bot czeka losowo `delay_seconds`
+  (domyślnie 10–20 s).
+- Na GitHubie Ceneo jest pominięte (`PRICE_SOURCES: amazon,xkom,morele` w workflow), bo blokuje serwery GitHuba.
   Ceneo zadziała, gdy uruchomisz bota z domowego internetu.
 
 - `category` – `gpu` albo `cpu`. Kanał Pepper z polem `price_watch_category` (np. „Procesory” z `cpu`)

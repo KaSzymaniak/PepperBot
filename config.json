@@ -22,8 +22,9 @@
   "price_watch": {
     "interval_minutes": 30,
     "sources": [
-      "ceneo",
-      "amazon"
+      "amazon",
+      "xkom",
+      "morele"
     ],
     "items": [
       {

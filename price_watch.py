@@ -1,4 +1,4 @@
-"""Obserwowanie cen kart graficznych na Ceneo i Amazon.pl.
+"""Obserwowanie cen kart graficznych i procesorów na Amazon.pl, x-kom, Morele i Ceneo.
 
 Dla każdej karty z listy price_watch.items w config.json szuka ofert i wysyła
 powiadomienie (Discord/Telegram, te same sekrety co pepper_bot.py), gdy cena
@@ -97,11 +97,51 @@ def search_amazon(query):
             }
 
 
+def search_xkom(query):
+    d = browser_get("https://www.x-kom.pl/szukaj?q=" + urllib.parse.quote(query))
+    if '"availabilityStatus"' not in d and "Nie znaleźliśmy" not in d:
+        raise Blocked("x-kom nie zwrócił listy produktów (blokada lub zmiana strony)")
+    # lista produktów jest w JSON-ie strony; każdy produkt zaczyna się od statusu dostępności
+    for chunk in d.split('"availabilityStatus":"')[1:]:
+        if not chunk.startswith("Available"):
+            continue  # brak w magazynie - x-kom pokazuje wtedy starą cenę
+        m = re.search(r'"webUrl":"([^"]+)","fullName":"([^"]*)".*?"price":([\d.]+),'
+                      r'"category":\{[^}]*?"parentCategoryName":"([^"]*)"', chunk)
+        # wyszukiwarka podsuwa też gotowe zestawy komputerowe
+        if m and m.group(4) in ("Karty graficzne", "Procesory"):
+            yield {
+                "source": "x-kom",
+                "name": html.unescape(m.group(2)),
+                "link": "https://www.x-kom.pl" + m.group(1),
+                "price": float(m.group(3)),
+            }
+
+
+def search_morele(query):
+    # bez kategorii Morele zwraca głównie gotowe komputery; 45 = procesory, 12 = karty graficzne
+    category = 45 if "ryzen" in query else 12
+    d = browser_get(f"https://www.morele.net/wyszukiwarka/?q={urllib.parse.quote_plus(query)}&categoryId={category}")
+    if "product-card" not in d and "category-search-title" not in d:
+        raise Blocked("Morele nie zwróciło listy produktów (blokada lub zmiana strony)")
+    for chunk in d.split('class="product-card__details"')[1:]:
+        name = re.search(r'class="product-card__name-link"[^>]*>\s*([^<]+?)\s*</a>', chunk)
+        link = re.search(r'href="(https://www\.morele\.net/[^"]+)"', chunk)
+        # produkty niedostępne nie mają ceny
+        price = re.search(r'data-testid="product-price-new">\s*([\d\s\xa0]+),(\d{2})', chunk)
+        if name and link and price:
+            yield {
+                "source": "Morele",
+                "name": html.unescape(name.group(1)),
+                "link": link.group(1),
+                "price": to_price(price.group(1), price.group(2)),
+            }
+
+
 class Blocked(Exception):
     """Sklep pokazał captchę/challenge - nie próbujemy go obchodzić, tylko odpuszczamy do następnej rundy."""
 
 
-SOURCES = {"ceneo": search_ceneo, "amazon": search_amazon}
+SOURCES = {"ceneo": search_ceneo, "amazon": search_amazon, "xkom": search_xkom, "morele": search_morele}
 
 
 def is_model(offer, item):
@@ -169,20 +209,31 @@ def check(config, dry_run=False, force=False):
     queries = watch.get("queries") or list(dict.fromkeys(i.get("query", i["name"]) for i in items))
     lo, hi = watch.get("delay_seconds", [10, 20])
     sources = os.environ.get("PRICE_SOURCES", "").split(",") if os.environ.get("PRICE_SOURCES") else watch.get("sources", ["ceneo"])
+    sources = [s.strip() for s in sources]
+    blocked = set()
     notified = load_state()
     sent = 0
-    first = True
-    for source in sources:
-        search = SOURCES[source.strip()]
-        for query in queries:
-            if not first:
-                time.sleep(random.uniform(lo, hi))  # spokojne tempo, żeby nie obciążać sklepu
-            first = False
+    # każde zapytanie po kolei we wszystkich sklepach, potem przerwa - każdy sklep
+    # dostaje zapytanie co delay_seconds, a całość trwa tyle, co przy jednym sklepie
+    for n, query in enumerate(queries):
+        if n:
+            time.sleep(random.uniform(lo, hi))  # spokojne tempo, żeby nie obciążać sklepów
+        for source in sources:
+            if source in blocked:
+                continue
             try:
-                offers = list(search(query))
+                offers = list(SOURCES[source](query))
             except Blocked as e:
                 print(f"{e} - pomijam {source} do następnego sprawdzenia")
-                break
+                blocked.add(source)
+                continue
+            except urllib.error.HTTPError as e:
+                if e.code == 403:
+                    print(f"{source} odmówił dostępu (HTTP 403) - pomijam do następnego sprawdzenia")
+                    blocked.add(source)
+                else:
+                    print(f"Błąd {source} / {query}: {e}")
+                continue
             except Exception as e:
                 print(f"Błąd {source} / {query}: {e}")
                 continue
@@ -211,7 +262,7 @@ def check(config, dry_run=False, force=False):
     if not dry_run:
         LAST_RUN_FILE.write_text(str(time.time()))
         save_state(notified)
-    print(f"{time.strftime('%H:%M:%S')} ceny: wysłano {sent} powiadomień ({len(queries)} zapytań na źródło)")
+    print(f"{time.strftime('%H:%M:%S')} ceny: wysłano {sent} powiadomień ({len(queries)} zapytań na źródło: {', '.join(sources)})")
 
 
 def main():
