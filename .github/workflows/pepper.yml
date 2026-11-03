@@ -29,7 +29,7 @@ jobs:
       LOOP_MINUTES: 58
       CHECK_EVERY: 60
       # Ceneo blokuje serwery GitHuba, więc go tu pomijamy
-      PRICE_SOURCES: amazon,xkom,morele
+      PRICE_SOURCES: amazon,xkom,morele,mediamarkt,proline,sferis
     steps:
       - uses: actions/checkout@v5
 

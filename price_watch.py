@@ -1,4 +1,4 @@
-"""Obserwowanie cen kart graficznych i procesorów na Amazon.pl, x-kom, Morele i Ceneo.
+"""Obserwowanie cen kart graficznych i procesorów w sklepach (lista w SOURCES).
 
 Dla każdej karty z listy price_watch.items w config.json szuka ofert i wysyła
 powiadomienie (Discord/Telegram, te same sekrety co pepper_bot.py), gdy cena
@@ -137,11 +137,102 @@ def search_morele(query):
             }
 
 
+def search_proline(query):
+    d = browser_get("https://proline.pl/wyszukaj?searchString=" + urllib.parse.quote_plus(query))
+    if "product-list" not in d and "product-tile" not in d:
+        raise Blocked("Proline nie zwrócił listy produktów (blokada lub zmiana strony)")
+    for chunk in d.split('<a class="product-tile"')[1:]:
+        tile = re.match(r'\s*href="(/[^"]+)"\s*title="([^"]+)"', chunk)
+        # formularz "Dodaj do koszyka" (z nazwą, ceną i kategorią) mają tylko produkty dostępne
+        name = re.search(r'name="productName" value="([^"]+)"', chunk)
+        price = re.search(r'name="productPrice" value="([\d.]+)"', chunk)
+        category = re.search(r'name="category" value="([^"]+)"', chunk)
+        if not (tile and name and price and category):
+            continue
+        # kafelki dodatków (np. ochrona reklamacyjna) nie mają własnego formularza
+        # i łapałyby formularz innego produktu
+        if html.unescape(name.group(1)) != html.unescape(tile.group(2)):
+            continue
+        if re.match(r"Karty graficzne|Procesory", html.unescape(category.group(1))):
+            yield {
+                "source": "Proline",
+                "name": html.unescape(name.group(1)),
+                "link": "https://proline.pl" + tile.group(1),
+                "price": float(price.group(1)),
+            }
+
+
+def search_sferis(query):
+    d = browser_get("https://www.sferis.pl/wyszukaj?s=" + urllib.parse.quote_plus(query))
+    if "jsProductListingItems" not in d:
+        raise Blocked("Sferis nie zwrócił listy produktów (blokada lub zmiana strony)")
+    # każdy kafelek zaczyna się od linku do produktu kończącego się na -i<id>
+    for chunk in re.split(r'(?=<a href="/[^"]+-i\d+" class="[^"]*jsCard")', d)[1:]:
+        link = re.match(r'<a href="(/[^"]+)"', chunk)
+        name = re.search(r'<p class="title">\s*([^<]+?)\s*</p>', chunk)
+        price = re.search(r'<span class="price">\s*([\d\s\xa0]+),(\d{2})', chunk)
+        # niedostępne produkty nie mają przycisku "Dodaj do koszyka"
+        if link and name and price and "/dodaj-do-koszyka/" in chunk:
+            yield {
+                "source": "Sferis",
+                "name": html.unescape(name.group(1)),
+                "link": "https://www.sferis.pl" + link.group(1),
+                "price": to_price(price.group(1), price.group(2)),
+            }
+
+
+def search_mediamarkt(query):
+    # bez słowa "karta graficzna"/"procesor" MediaMarkt zwraca głównie gotowe komputery
+    prefix = "procesor " if "ryzen" in query else "karta graficzna "
+    d = browser_get("https://mediamarkt.pl/pl/search.html?query=" + urllib.parse.quote(prefix + query))
+    if '"__typename":"GraphqlProduct"' not in d and "GraphqlSearchFacet" not in d:
+        raise Blocked("MediaMarkt nie zwrócił listy produktów (blokada lub zmiana strony)")
+    # produkty są w JSON-ie strony: osobno nazwa z linkiem, dostępność i cena, łączone po id
+    for product_id in dict.fromkeys(re.findall(r'"GraphqlProduct:Media:pl-PL:(\d+)":', d)):
+        product = json_object_after(d, f'"GraphqlProduct:Media:pl-PL:{product_id}"')
+        status = json_object_after(d, f'"CofrOnlineStatusFeature:Media:pl:{product_id}"')
+        price = json_object_after(d, f'"CofrPriceFeature:{{\\"id\\":\\"Media:pl:{product_id}\\"')
+        # sama wyszukiwarka trzyma też stare ceny ofert, których nie da się już kupić
+        if not (product and status and status.get("isAvailableAndBuyable") and price and price.get("price")):
+            continue
+        title = product.get("title") or ""
+        if re.match(r"karta graficzna|procesor", title.lower()):
+            yield {
+                "source": "MediaMarkt",
+                "name": title,
+                "link": "https://mediamarkt.pl" + product["url"],
+                "price": float(price["price"]["amount"]),
+            }
+
+
+def json_object_after(d, key_prefix):
+    """Obiekt JSON zapisany na stronie pod kluczem zaczynającym się od key_prefix, albo None."""
+    i = d.find(key_prefix)
+    if i < 0:
+        return None
+    # koniec klucza: '":' bez ukośnika przed cudzysłowem (klucze cen mają w sobie zakodowany JSON)
+    end = re.compile(r'(?<!\\)":(?=\{)').search(d, i + 1)
+    if not end:
+        return None
+    try:
+        return json.JSONDecoder().raw_decode(d, end.end())[0]
+    except ValueError:
+        return None
+
+
 class Blocked(Exception):
     """Sklep pokazał captchę/challenge - nie próbujemy go obchodzić, tylko odpuszczamy do następnej rundy."""
 
 
-SOURCES = {"ceneo": search_ceneo, "amazon": search_amazon, "xkom": search_xkom, "morele": search_morele}
+SOURCES = {
+    "ceneo": search_ceneo,
+    "amazon": search_amazon,
+    "xkom": search_xkom,
+    "morele": search_morele,
+    "proline": search_proline,
+    "sferis": search_sferis,
+    "mediamarkt": search_mediamarkt,
+}
 
 
 def is_model(offer, item):

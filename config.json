@@ -24,46 +24,49 @@
     "sources": [
       "amazon",
       "xkom",
-      "morele"
+      "morele",
+      "mediamarkt",
+      "proline",
+      "sferis"
     ],
     "items": [
       {
         "name": "RTX 5060",
         "query": "rtx 5060",
         "include": "5060(?!\\s*ti)",
-        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|5060\\s*ti|5060ti|5050",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|komputer|zestaw|5060\\s*ti|5060ti|5050",
         "max_price": 1850,
         "category": "gpu"
       },
       {
         "name": "RX 9060 XT 8GB",
         "query": "rx 9060 xt 8gb",
-        "include": "9060\\s*xt.*\\b8\\s*gb",
-        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|16\\s*gb|9070",
+        "include": "9060\\s*xt.*(?<!\\d)8\\s*gb?\\b",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|komputer|zestaw|(?<!\\d)16\\s*gb?\\b|9070",
         "max_price": 1900,
         "category": "gpu"
       },
       {
         "name": "RTX 5060 Ti 8GB",
         "query": "rtx 5060 ti 8gb",
-        "include": "5060\\s*ti.*\\b8\\s*gb",
-        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|16\\s*gb|5050|rtx\\s*5060(?!\\s*ti)",
+        "include": "5060\\s*ti.*(?<!\\d)8\\s*gb?\\b",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|komputer|zestaw|(?<!\\d)16\\s*gb?\\b|5050|rtx\\s*5060(?!\\s*ti)",
         "max_price": 2100,
         "category": "gpu"
       },
       {
         "name": "RX 9060 XT 16GB",
         "query": "rx 9060 xt 16gb",
-        "include": "9060\\s*xt.*16\\s*gb",
-        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|9070",
+        "include": "9060\\s*xt.*(?<!\\d)16\\s*gb?\\b",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|komputer|zestaw|9070",
         "max_price": 2450,
         "category": "gpu"
       },
       {
         "name": "RTX 5060 Ti 16GB",
         "query": "rtx 5060 ti 16gb",
-        "include": "5060\\s*ti.*16\\s*gb",
-        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|5050|5070",
+        "include": "5060\\s*ti.*(?<!\\d)16\\s*gb?\\b",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|komputer|zestaw|5050|5070",
         "max_price": 2900,
         "category": "gpu"
       },
@@ -71,7 +74,7 @@
         "name": "RX 9070 GRE",
         "query": "rx 9070 gre",
         "include": "9070\\s*gre",
-        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|9060",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|komputer|zestaw|9060",
         "max_price": 2650,
         "category": "gpu"
       },
@@ -79,7 +82,7 @@
         "name": "RTX 5070",
         "query": "rtx 5070",
         "include": "5070",
-        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|5070\\s*ti|5070ti|5060|5080",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|komputer|zestaw|5070\\s*ti|5070ti|5060|5080",
         "max_price": 3300,
         "category": "gpu"
       },
@@ -87,7 +90,7 @@
         "name": "RX 9070",
         "query": "rx 9070 16gb",
         "include": "9070",
-        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|xt|gre|12\\s*gb|9060",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|komputer|zestaw|xt|gre|12\\s*gb|9060",
         "max_price": 3150,
         "category": "gpu"
       },
@@ -95,7 +98,7 @@
         "name": "RX 9070 XT",
         "query": "rx 9070 xt",
         "include": "9070\\s*xt",
-        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|9060",
+        "exclude": "laptop|notebook|backplate|uchwyt|wentylator|kabel|komputer|zestaw|9060",
         "max_price": 3700,
         "category": "gpu"
       },
