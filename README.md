@@ -87,7 +87,8 @@ blokadę i tutaj – wtedy pominięte wyszukiwania wracają przy następnym spra
 3. Utwórz `C:\PepperBot\secrets.json` z webhookiem Discorda:
    `{"discord_webhook": "https://discord.com/api/webhooks/..."}`. Webhook skopiujesz w Discordzie:
    ustawienia serwera → Integracje → Webhooki (z sekretów GitHuba nie da się go odczytać).
-4. Test w wierszu poleceń: `py C:\PepperBot\laptop_watch.py`, potem otwórz `C:\PepperBot\laptop.log`.
+4. Test wysyłki: `py C:\PepperBot\laptop_watch.py --test` (wiadomość na Discordzie).
+   Test cen: `py C:\PepperBot\laptop_watch.py`, potem otwórz `C:\PepperBot\laptop.log`.
    Powinna tam być linia `ceny: wysłano ... (9 zapytań na źródło: amazon, xkom, ceneo)`.
 5. Uruchamianie co 10 minut bez okna konsoli:
    `schtasks /create /tn "PepperBot ceny" /tr "pyw C:\PepperBot\laptop_watch.py" /sc minute /mo 10 /f`
