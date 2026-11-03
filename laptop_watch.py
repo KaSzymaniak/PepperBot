@@ -19,7 +19,21 @@ sys.path.insert(0, str(HERE))
 LOG_FILE = HERE / "laptop.log"
 
 
+def send_test():
+    """py laptop_watch.py --test - wysyła wiadomość testową na Discorda."""
+    from pepper_bot import http_post_json, load_config
+    config = load_config()
+    if not config["discord_webhook"]:
+        print("Brak webhooka - sprawdź, czy plik nazywa się secrets.json (nie secrets.json.txt).")
+        return
+    http_post_json(config["discord_webhook"], {"content": "Test z laptopa - bot cen działa."})
+    print("Wysłano wiadomość testową na Discorda.")
+
+
 def main():
+    if "--test" in sys.argv:
+        send_test()
+        return
     # pyw nie ma konsoli, więc wszystko idzie do pliku
     with open(LOG_FILE, "a", encoding="utf-8") as log:
         sys.stdout = sys.stderr = log

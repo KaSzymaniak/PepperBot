@@ -32,6 +32,7 @@ HERE = Path(__file__).resolve().parent
 # laptop trzyma własny stan, żeby nie gryzł się z plikiem commitowanym przez GitHuba
 STATE_FILE = Path(os.environ.get("PRICE_STATE_FILE") or HERE / "price_state.json")
 LAST_RUN_FILE = HERE / ".price_last_run"  # poza repo, żeby nie commitować co 15 min
+MAX_CHALLENGES = 2  # po tylu blokadach antybotowych w jednej rundzie sklep jest pomijany
 BROWSER_UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/130.0 Safari/537.36"
@@ -303,6 +304,7 @@ def check(config, dry_run=False, force=False):
     sources = os.environ.get("PRICE_SOURCES", "").split(",") if os.environ.get("PRICE_SOURCES") else watch.get("sources", ["ceneo"])
     sources = [s.strip() for s in sources]
     blocked = set()
+    challenges = {}  # ile razy sklep pokazał ochronę antybotową w tej rundzie
     notified = load_state()
     sent = 0
     # każde zapytanie po kolei we wszystkich sklepach, potem przerwa - każdy sklep
@@ -316,8 +318,14 @@ def check(config, dry_run=False, force=False):
             try:
                 offers = list(SOURCES[source](query))
             except Blocked as e:
-                print(f"{e} - pomijam {source} do następnego sprawdzenia")
-                blocked.add(source)
+                # Amazon często odrzuca pojedyncze zapytanie, a kolejne (po zwykłej przerwie)
+                # przepuszcza - odpuszczamy sklep dopiero po drugiej blokadzie w rundzie
+                challenges[source] = challenges.get(source, 0) + 1
+                if challenges[source] >= MAX_CHALLENGES:
+                    print(f"{e} ({query}) - drugi raz, pomijam {source} do następnego sprawdzenia")
+                    blocked.add(source)
+                else:
+                    print(f"{e} ({query}) - pomijam to wyszukiwanie")
                 continue
             except urllib.error.HTTPError as e:
                 if e.code == 403:
