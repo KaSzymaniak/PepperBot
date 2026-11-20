@@ -72,7 +72,7 @@ wcześniej wróciła powyżej progu. Stan zapisuje w `price_state.json`.
   Amazon, x-kom i Ceneo sprawdza laptop w domu – patrz niżej.
 
 - `category` – `gpu` albo `cpu`. Kanał Pepper z polem `price_watch_category` (np. „Procesory” z `cpu`)
-  przepuszcza tylko modele z tej kategorii, każdy w swoim progu `max_price`.
+  przepuszcza tylko modele z tej kategorii, w dowolnej cenie (progi `max_price` dotyczą tylko obserwowania cen).
 
 Lokalnie: `python price_watch.py --dry-run` pokaże, co by wysłał.
 

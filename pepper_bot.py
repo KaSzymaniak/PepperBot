@@ -111,12 +111,10 @@ def matches(deal, feed):
         return False
     category = feed.get("price_watch_category")
     if category:
-        # tylko modele z listy price_watch tej kategorii, każdy z własnym progiem ceny
+        # tylko modele z listy price_watch tej kategorii, w dowolnej cenie - okazje na Pepper
+        # są już wyselekcjonowane, a progi max_price odcinały realne promocje
         models = [i for i in feed["_price_watch_items"] if i.get("category") == category]
-        model = next((m for m in models if model_matches(title, m)), None)
-        if model is None:
-            return False
-        if deal["price"] is not None and deal["price"] > model["max_price"]:
+        if not any(model_matches(title, m) for m in models):
             return False
     return True
 
