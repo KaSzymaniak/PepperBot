@@ -37,6 +37,9 @@ Edytuj `config.json` (można bezpośrednio na GitHubie, ikoną ołówka):
 - `keywords` – słowa, z których co najmniej jedno musi być w tytule, np. `["5070", "9070"]`. Pusta lista = wszystko.
 - `exclude` – słowa, które wykluczają okazję.
 - `max_price` – maksymalna cena w zł, `null` = bez limitu.
+- `title_regex` / `title_exclude_regex` – wyrażenia regularne na tytuł (małymi literami). Kanał
+  „Procesory” przepuszcza nimi wszystkie procesory na AM4 (Tray i BOX, w dowolnej cenie),
+  bez AM5, laptopów, mini PC, chłodzeń i płyt.
 
 ## Dobrze wiedzieć
 
@@ -71,8 +74,7 @@ wcześniej wróciła powyżej progu. Stan zapisuje w `price_state.json`.
 - Na GitHubie sprawdzane są tylko Morele, MediaMarkt, Proline i Sferis (`PRICE_SOURCES` w workflow).
   Amazon, x-kom i Ceneo sprawdza laptop w domu – patrz niżej.
 
-- `category` – `gpu` albo `cpu`. Kanał Pepper z polem `price_watch_category` (np. „Procesory” z `cpu`)
-  przepuszcza tylko modele z tej kategorii, w dowolnej cenie (progi `max_price` dotyczą tylko obserwowania cen).
+- `category` – `gpu` albo `cpu`, opisowo (filtr Pepper ma własne `title_regex`).
 
 Lokalnie: `python price_watch.py --dry-run` pokaże, co by wysłał.
 

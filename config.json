@@ -16,7 +16,8 @@
       "keywords": [],
       "exclude": [],
       "max_price": null,
-      "price_watch_category": "cpu"
+      "title_regex": "\\bam4\\b|ryzen\\W*\\d?\\W*[1-5]\\d{3}(?!\\d)(?!\\s*(?:u|h|hs|hx)\\b)",
+      "title_exclude_regex": "laptop|notebook|zestaw|komputer|mini ?pc|chłodz|cooler|płyta|\\bnas\\b"
     }
   ],
   "price_watch": {
