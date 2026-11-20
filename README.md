@@ -76,11 +76,13 @@ wcześniej wróciła powyżej progu. Stan zapisuje w `price_state.json`.
 
 Lokalnie: `python price_watch.py --dry-run` pokaże, co by wysłał.
 
-## Laptop w domu (Amazon, x-kom, Ceneo co 10 minut)
+## Laptop w domu (x-kom co 10 minut, Amazon i Ceneo co 30 minut)
 
 Te sklepy blokują serwery GitHuba, ale wpuszczają domowy internet (Amazon czasem pokazuje
 blokadę i tutaj – wtedy pominięte wyszukiwania wracają przy następnym sprawdzeniu).
-`laptop_watch.py` sprawdza je, a wynik dopisuje do `laptop.log`.
+`laptop_watch.py` sprawdza je, a wynik dopisuje do `laptop.log`. Amazon i Ceneo są sprawdzane
+rzadziej (`SOURCE_INTERVALS` w `laptop_watch.py`), bo przy zapytaniach co 10 minut przez całą dobę
+coraz częściej blokowały także domowe łącze.
 
 1. Zainstaluj Pythona z python.org i zaznacz „Add python.exe to PATH”.
 2. Pobierz repo (Code → Download ZIP) i rozpakuj do `C:\PepperBot`.
